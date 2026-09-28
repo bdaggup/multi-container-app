@@ -1,24 +1,19 @@
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Docker compose reference guide at
-# https://docs.docker.com/compose/compose-file/
-
-# Here the instructions define your application as two services called "todo-app" and “todo-database”
-# The service “todo-app” is built from the Dockerfile in the /app directory,
-# and the service “todo-database” uses the official MongoDB image 
-# from Docker Hub - https://hub.docker.com/_/mongo. 
-# You can add other services your application may depend on here.
-
+name: todos
 services:
-  todo-app:
+  todos-app:
+    # If container name to be todos-app, we need to assign the container_name as below since,
+    # it considers the first word(todos) as service name and excludes from the container name.
+    container_name: todos-todos-app
     build:
       context: ./app
-    depends_on:
-      - todo-database
     environment:
       NODE_ENV: production
     ports:
-      - 3000:3000
+      - 3046:3000
       - 35729:35729
+    depends_on:
+      - todos-db
+      - todos-cache
     develop:
       watch:
         - path: ./app/package.json
@@ -26,13 +21,17 @@ services:
         - path: ./app
           target: /usr/src/app
           action: sync
-
-  todo-database:
-    image: mongo:6
-    #volumes: 
-    #  - database:/data/db
+  todos-db:
+    image: td-db
+    container_name: todos-todos-db
+    build:
+      context: ./db
     ports:
       - 27017:27017
-
-#volumes:
-  #database:
+  todos-cache:
+    image: td-cache
+    container_name: todos-todos-cache
+    build:
+      context: ./cache
+    ports:
+      - 6379:6379
