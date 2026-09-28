@@ -19,7 +19,7 @@ services:
         - path: ./app/package.json
           action: rebuild
         - path: ./app
-          target: /usr/src/app
+          target: /app/todos
           action: sync
   todos-db:
     image: td-db
